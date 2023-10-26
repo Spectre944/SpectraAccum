@@ -1,0 +1,9 @@
+{
+    "files": [
+        "assets/qml/main.qml",
+        "classes/COMworker.py",
+        "classes/SpectraManager.py",
+        "classes/Calibration.py",
+        "main.py"
+    ]
+}
