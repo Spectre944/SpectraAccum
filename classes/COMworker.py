@@ -5,6 +5,7 @@ import serial.tools.list_ports
 import serial
 import threading
 import time
+import numpy as np
 
 class COMworker(QtCore.QObject):
     def __init__(self):
@@ -19,6 +20,7 @@ class COMworker(QtCore.QObject):
         self.spectrParam =  bytes([0x55, 0xAA, 0x04, 0x00, 0x03, 0x00, 0x01, 0x04])
 
         self.devList = []
+        self.spectra_buffers = {}  # Словарь для буферов данных
 
         self.stop_threads = False  # Флаг для управления потоками
         self.regime = "param"
@@ -82,16 +84,34 @@ class COMworker(QtCore.QObject):
                         pass
                     elif self.regime == "param":
                         ser.write(self.spectrParam)
+                        response = ser.read(50)  # Прочитайте ответ и обработайте его
+                        if response:
+                            print(response)
+
+
                     elif self.regime == "newSpectr":
                         ser.write(self.newSpectr)
+                        response = ser.read(50)  # Прочитайте ответ и обработайте его
+                        if response:
+                            print(response)
+
+
                     elif self.regime == "spectr":
                         ser.write(self.getSpectr)
+                        response = ser.read(2060 * 2)  # Предполагаем, что 2048 каналов по 2 байта каждый
+                        if len(response) > 4000:
+                            data = np.frombuffer(response[8:4104], dtype=np.uint16)
+                            buffer = self.get_spectra_buffer(com_port)
+                            buffer += data
+                            #say spectr accepted
+                            ser.write(self.spectrOk)
+
                     elif self.regime == "stop":
                         ser.write(self.techModeEnd)
+                        response = ser.read(50)  # Прочитайте ответ и обработайте его
+                        if response:
+                            print(response)
 
-                    response = ser.read(100)  # Прочитайте ответ и обработайте его
-                    if response:
-                        print(response)
 
             except serial.SerialException:
                 print(f"Failed to open {com_port}")
@@ -100,10 +120,12 @@ class COMworker(QtCore.QObject):
     def stopThreads(self):
             self.stop_threads = True  # Установите флаг для остановки потоков
 
-    def acquireSpectra(self, com_port, interval=2):
-        while True:
-            response = self.sendData(self.serialReq, com_port)
-            if response:
-                # Обработка данных спектра
-                pass
-            time.sleep(interval)
+    # ##----------------SPECTR----------------# ##
+
+    def get_spectra_buffer(self, com_port):
+            if com_port in self.spectra_buffers:
+                return self.spectra_buffers[com_port]
+            else:
+                # Если буфер для данного порта еще не существует, создайте новый
+                self.spectra_buffers[com_port] = np.zeros(2048)
+                return self.spectra_buffers[com_port]

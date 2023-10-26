@@ -14,5 +14,8 @@ class SpectraManager(QtCore.QObject):
         self.comWorker.scanDevices()
         self.comWorker.connectDevices()
 
+    def getSpectrum(self, com):
+        buffer = self.comWorker.get_spectra_buffer(com)
+
     def startAccumulation(self, status):
         pass
