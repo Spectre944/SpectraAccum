@@ -23,12 +23,13 @@ class COMworker(QtCore.QObject):
         self.spectra_buffers = {}  # Словарь для буферов данных
 
         self.stop_threads = False  # Флаг для управления потоками
-        self.regime = "param"
+        self.regime = "spectr"
 
-
+    def __del__(self):
+        self.regime = "stop"
 
     def scanDevices(self):
-        excluded_ports = [6, 7, 24, 26, 28, 30]  # Перечислите номера портов, которые нужно исключить
+        excluded_ports = [6, 7, 22, 32, 34, 40]  # Перечислите номера портов, которые нужно исключить
 
         com_ports = [port.device for port in serial.tools.list_ports.comports()]
         filtered_com_ports = [com_port for com_port in com_ports if int(com_port.replace("COM", "")) not in excluded_ports]
@@ -94,17 +95,22 @@ class COMworker(QtCore.QObject):
                         response = ser.read(50)  # Прочитайте ответ и обработайте его
                         if response:
                             print(response)
+                            self.regime = "spectr"
 
 
                     elif self.regime == "spectr":
                         ser.write(self.getSpectr)
                         response = ser.read(2060 * 2)  # Предполагаем, что 2048 каналов по 2 байта каждый
+                        print(response)
+                        print(len(response))
                         if len(response) > 4000:
                             data = np.frombuffer(response[8:4104], dtype=np.uint16)
                             buffer = self.get_spectra_buffer(com_port)
                             buffer += data
                             #say spectr accepted
                             ser.write(self.spectrOk)
+                            response = ser.read(100)
+                            print(response)
 
                     elif self.regime == "stop":
                         ser.write(self.techModeEnd)

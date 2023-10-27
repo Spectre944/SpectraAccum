@@ -6,11 +6,10 @@ from classes.COMworker import COMworker
 class SpectraManager(QtCore.QObject):
     def __init__(self):
         super().__init__()
-        self.initDevices(1)
+        self.comWorker = COMworker()
 
 
     def initDevices(self, status):
-        self.comWorker = COMworker()
         self.comWorker.scanDevices()
         self.comWorker.connectDevices()
 
