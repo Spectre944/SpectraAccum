@@ -41,6 +41,27 @@ ApplicationWindow {
             valueAxisY.min = 0;
             valueAxisY.max = Math.max(...spectrum);
         }
+
+        function onGausChangedUsl(spectrum, name) {
+            // Clear the existing series data
+            gausSeries.clear();
+            gausSeries.name = name
+
+
+            // Add the updated spectrum data to the series
+            //for (var i = 0; i < spectrum.length; i++) {
+            for (var i = 0; i < 2048; i++) {
+                var dataPoint = spectrum[i];
+                gausSeries.append(i, dataPoint);
+            }
+
+            // Update the axis range based on the new data
+            valueAxisX.min = 0;
+            valueAxisX.max = gausSeries.length - 1;
+
+            valueAxisY.min = 0;
+            valueAxisY.max = Math.max(...spectrum);
+        }
     }
 
     menuBar: MenuBar {
@@ -184,6 +205,13 @@ ApplicationWindow {
 
                                         LineSeries {
                                             id: spectrumSeries
+                                            name: "Spectrum"
+                                            axisX: valueAxisX
+                                            axisY: valueAxisY
+                                        }
+
+                                        LineSeries {
+                                            id: gausSeries
                                             name: "Spectrum"
                                             axisX: valueAxisX
                                             axisY: valueAxisY

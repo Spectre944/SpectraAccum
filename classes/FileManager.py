@@ -8,6 +8,7 @@ import os
 
 class FileManager(QtCore.QObject):
     spectrumChangedUsl = QtCore.Signal(list, str)
+    gausChangedUsl = QtCore.Signal(list, str)
 
     def __init__(self):
         super().__init__()
@@ -47,6 +48,7 @@ class FileManager(QtCore.QObject):
 
     @QtCore.Slot()
     def processSpectrumUsi(self):
-        aver_spec = self.calib.averageSpectrum(self.spectrum)
-        print(aver_spec)
+        aver_spec = self.calib.compute_moving_average(self.spectrum, 5)
         self.spectrumChangedUsl.emit(aver_spec, "Avr")
+        gausSpec = self.calib.gaussian_correl(aver_spec, 2)
+        self.gausChangedUsl.emit(gausSpec, "Gaus")

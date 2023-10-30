@@ -29,7 +29,7 @@ class COMworker(QtCore.QObject):
         self.regime = "stop"
 
     def scanDevices(self):
-        excluded_ports = [6, 7, 22, 32, 34, 40]  # Перечислите номера портов, которые нужно исключить
+        excluded_ports = [6, 7, 22, 36, 38, 40]  # Перечислите номера портов, которые нужно исключить
 
         com_ports = [port.device for port in serial.tools.list_ports.comports()]
         filtered_com_ports = [com_port for com_port in com_ports if int(com_port.replace("COM", "")) not in excluded_ports]
