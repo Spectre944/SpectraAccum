@@ -15,6 +15,7 @@ Item {
         color: "#fafafa"
         radius: 10
         anchors.fill: parent
+        anchors.margins: 20
         layer.enabled: true
         layer.effect: DropShadow {
             color: "#a3676767"

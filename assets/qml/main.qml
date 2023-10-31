@@ -9,8 +9,8 @@ import "../qml/windows"
 import "../qml/modules"
 
 ApplicationWindow {
-    width: 640
-    height: 480
+    width: 1280
+    height: 720
     visible: true
     title: qsTr("Hello World")
 
@@ -55,12 +55,14 @@ ApplicationWindow {
                 gausSeries.append(i, dataPoint);
             }
 
-            // Update the axis range based on the new data
-            valueAxisX.min = 0;
-            valueAxisX.max = gausSeries.length - 1;
+        }
 
-            valueAxisY.min = 0;
-            valueAxisY.max = Math.max(...spectrum);
+        function onGetParamFromSettingsUsi(){
+            param = []
+            param.append(parseInt(averFactor.text))
+            param.append(parseInt(sigmaFactor.text))
+            fmContext.getParamFromSettingsUsi(param)
+            console.log(param)
         }
     }
 
@@ -116,6 +118,7 @@ ApplicationWindow {
             SwipeView {
                 id: swipeView
                 anchors.fill: parent
+                interactive: true
 
                 Page {
                     id: pageDevices
@@ -124,17 +127,32 @@ ApplicationWindow {
                         id: rectangleDevices
                         color: "#dbdcdc"
                         anchors.fill: parent
+                        anchors.margins: 0
 
                         ScrollView {
                             id: scrollViewDevices
                             anchors.fill: parent
-                            padding: 0
-                            rightPadding: 10
-                            bottomPadding: 10
-                            leftPadding: 10
-                            topPadding: 10
+                            padding: 10
 
 
+                            WinDevlist {
+                                id: devListRect
+                                width: parent.width * 0.2
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                            }
+
+                            WinSpectr {
+                                id: devSpectrRect
+                                anchors.left: devListRect.right
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                width: parent.width * 0.8 - 20
+                            }
+
+
+
+                            /*
                             Rectangle {
                                 id: rectangleDevListContent
                                 color: "#fafafa"
@@ -219,7 +237,7 @@ ApplicationWindow {
                                     }
                                 }
                             }
-
+                            */
                         }
                     }
 
@@ -228,38 +246,9 @@ ApplicationWindow {
                 Page {
                     id: pageSettings
 
-                    Rectangle {
-                        id: rectangleSettings
-                        color: "#dbdcdc"
-                        anchors.fill: parent
-
-                        ScrollView {
-                            id: scrollViewSettings
-                            anchors.fill: parent
-
-                            Rectangle {
-                                id: rectangleSettingsContent
-                                color: "#fafafa"
-                                radius: 10
-                                border.width: 0
-                                anchors.fill: parent
-                                anchors.rightMargin: 20
-                                anchors.leftMargin: 20
-                                anchors.bottomMargin: 20
-                                anchors.topMargin: 20
-                                layer.enabled: true
-                                layer.effect: DropShadow {
-                                    color: "#a3676767"
-                                    transparentBorder: true
-                                    horizontalOffset: 2
-                                    verticalOffset: 4
-                                    radius: 4
-
-                                }
-                            }
-                        }
+                    WinSettings {
+                         anchors.fill: parent
                     }
-
                 }
 
                 Page {

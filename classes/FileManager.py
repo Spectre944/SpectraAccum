@@ -3,19 +3,33 @@ from PySide6 import QtCore
 from classes.Calibration import Calibration
 
 from urllib.parse import unquote
+import json
 import csv
 import os
 
 class FileManager(QtCore.QObject):
     spectrumChangedUsl = QtCore.Signal(list, str)
     gausChangedUsl = QtCore.Signal(list, str)
+    getParamFromSettingsBsi = QtCore.Signal()
 
     def __init__(self):
         super().__init__()
         self.spectrum = []
         self.calib = Calibration()
 
+        # parameters of calibration
+        self.averageFactor = 5
+        self.sigmaFactor = 2
 
+
+    @QtCore.Slot(str)
+    def loadCalibParamUsi(self, param):
+        # Распарсите JSON-строку в объект Python
+        params = json.loads(param)
+
+        # Теперь вы можете использовать параметры в блоке settings
+        self.averageFactor = int(params["settings"]["calibrationParam"]["averageFactor"])
+        self.sigmaFactor = int(params["settings"]["calibrationParam"]["sigmaFactor"])
 
     @QtCore.Slot(str)
     def loadSpectrumUsi(self, url):
@@ -46,9 +60,19 @@ class FileManager(QtCore.QObject):
         except Exception as e:
             print(f"Произошла ошибка при чтении файла: {str(e)}")
 
+
+    @QtCore.Slot(list)
+    def getParamFromSettingsUsi(self):
+        return list
+
+
     @QtCore.Slot()
     def processSpectrumUsi(self):
-        aver_spec = self.calib.compute_moving_average(self.spectrum, 5)
+
+        self.getParamFromSettingsBsi.emit()
+        listParam = self.getParamFromSettingsUsi()
+
+        aver_spec = self.calib.compute_moving_average(self.spectrum, self.averageFactor)
         self.spectrumChangedUsl.emit(aver_spec, "Avr")
-        gausSpec = self.calib.gaussian_correl(aver_spec, 2)
+        gausSpec = self.calib.gaussian_correl(aver_spec, self.sigmaFactor)
         self.gausChangedUsl.emit(gausSpec, "Gaus")
