@@ -118,7 +118,7 @@ ApplicationWindow {
             SwipeView {
                 id: swipeView
                 anchors.fill: parent
-                interactive: true
+                interactive: false
 
                 Page {
                     id: pageDevices

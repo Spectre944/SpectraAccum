@@ -88,11 +88,10 @@ Item {
                 ChartView {
                     id: spectrumChart
                     anchors.fill: parent
-                    backgroundColor : "#00000000"
+                    backgroundColor: "#00000000"
                     anchors.margins: 0
                     antialiasing: true
                     legend.visible: false
-
 
                     ValueAxis {
                         id: valueAxisX
@@ -118,130 +117,17 @@ Item {
                         axisY: valueAxisY
                     }
 
-                    Rectangle {
-                        id: spectrumInfo
-                        height: parent.height
-                        color: "#0000ff15"
-                        width: 200
-                        anchors.right: parent.right
-                        radius: 10
-
-
-                        // Add a property to track the state of the rectangle
-                        property bool isExpanded: false
-
-                        MouseArea {
-                            id: addInfoMouseArea
-                            anchors.fill: parent
-
-                            onClicked: {
-                                // Toggle the isExpanded property when clicked
-                                spectrumInfo.isExpanded = !spectrumInfo.isExpanded
-                            }
-
-                            // Add hover effect to expand on hover
-                            onEntered: {
-                                if (!spectrumInfo.isExpanded)
-                                    spectrumInfo.expandAnimation.start()
-                            }
-                            onExited: {
-                                if (!spectrumInfo.isExpanded)
-                                    spectrumInfo.shrinkAnimation.start()
-                            }
-                        }
-
-                        /*
-                        Text {
-                            anchors.fill: parent
-                            horizontalAlignment: Text.AlignRight
-                            verticalAlignment: Text.AlignTop
-                            anchors.margins: 10
-                            font.family: "Poppins"
-                            font.pointSize: 12
-                            text: "Час: --\nПЕД: --\nCPS: --"
-                        }*/
-
-                        TextEdit {
-                            id: textEditSpectrumInfo
-                            //                        text: "Час накопичення: 000 сек \n" +
-                            //                              "Інтенсивність (інтегрована), cps: -\n" +
-                            //                              "Інтенсивність (спектр), cps: -\n" +
-                            //                              "ПЕД, мкЗв/год: -\n" +
-                            //                              "Температура, °C: -\n"
-                            textFormat: Text.RichText
-                            text: '<p> <img src="qrc:/icons/clock.svg" width="14" height="14">  0000 сек  </p>' +
-                                  '<p> <img src="qrc:/icons/asterisk.svg" width="14" height="14">  0000 cps  </p>' +
-                                  '<p> <img src="qrc:/icons/radioactive.svg" width="14" height="14">  00.00 мкЗв  </p>' +
-                                  '<p> <img src="qrc:/icons/thermometer-snow.svg" width="14" height="14">  00.00 °C  </p>'
-                            anchors.fill: parent
-                            font.pixelSize: 14
-                            horizontalAlignment: Text.AlignRight
-                            anchors.margins: 40
-                        }
-
-                        // Define an animation for expanding
-                        SequentialAnimation {
-                            id: expandAnimation
-                            NumberAnimation {
-                                target: spectrumInfo
-                                property: "width"
-                                to: parent.width*0.1
-                                duration: 300
-                            }
-                            PropertyAction {
-                                target: spectrumInfo
-                                property: "height"
-                                value: parent.height
-                            }
-                        }
-
-                        // Define an animation for shrinking
-                        SequentialAnimation {
-                            id: shrinkAnimation
-                            NumberAnimation {
-                                target: spectrumInfo
-                                property: "width"
-                                to: parent.width * 0.05
-                                duration: 300
-                            }
-                            PropertyAction {
-                                target: spectrumInfo
-                                property: "height"
-                                value: parent.height
-                            }
-                        }
-
-                        // Watch for changes in the isExpanded property and trigger animations accordingly
-                        onIsExpandedChanged: {
-                            if (isExpanded) {
-                                expandAnimation.start()
-                            } else {
-                                shrinkAnimation.start()
-                            }
-                        }
-                    }
-
-
                     TextEdit {
-                        visible: false
-                        id: textEditSpectrumInfo1
-                        //                        text: "Час накопичення: 000 сек \n" +
-                        //                              "Інтенсивність (інтегрована), cps: -\n" +
-                        //                              "Інтенсивність (спектр), cps: -\n" +
-                        //                              "ПЕД, мкЗв/год: -\n" +
-                        //                              "Температура, °C: -\n"
+                        id: textEditSpectrumInfo
                         textFormat: Text.RichText
-                        text: '<p> <img src="qrc:/icons/clock.svg" width="12" height="12">  0000, сек  </p>' +
-                              '<p> <img src="qrc:/icons/asterisk.svg" width="12" height="12">  0000 (0000), cps  </p>' +
-                              '<p> <img src="qrc:/icons/radioactive.svg" width="12" height="12">  00.00, мкЗв/год  </p>' +
-                              '<p>  <img src="qrc:/icons/thermometer-snow.svg" width="12" height="12">  00.00, °C  </p>'
+                        text: '<p> 0000 сек  </p>' +
+                              '<p> 0000 (0000) cps  </p>' +
+                              '<p> 00.00 мкЗв/год  </p>' +
+                              '<p> 00.00 °C  </p>'
                         anchors.fill: parent
                         font.pixelSize: 14
                         horizontalAlignment: Text.AlignRight
-                        anchors.rightMargin: 25
-                        anchors.leftMargin: 25
-                        anchors.bottomMargin: 25
-                        anchors.topMargin: 25
+                        anchors.margins: 50
                     }
 
                     Rectangle{
@@ -249,23 +135,110 @@ Item {
                         color: "#00000000"
                         border.color: "#50ff0000"
                         border.width: 2
-                        radius: 10
+                        radius: 4
                         clip: true
                         visible: false
                     }
 
-                    Rectangle{
+                    Rectangle {
                         id: linemarker
-                        height: parent.height
+                        y: spectrumChart.plotArea.top
+                        height: spectrumChart.plotArea.height
                         width: 1
                         visible: false
                         color: "#bbff0000"
                     }
 
                     MouseArea {
+                        id: crosshairMouseArea
+                        anchors.fill: spectrumChart
+                        hoverEnabled: true
+
+                        Rectangle {
+                            id: verticalCrosshair
+                            y: spectrumChart.plotArea.top
+                            x: crosshairMouseArea.mouseX - width / 2
+                            height: spectrumChart.plotArea.height
+                            width: 1
+                            visible: false
+                            color: "#bbff0000"
+
+                            Rectangle {
+                                anchors.top: parent.bottom
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                height: 25
+                                width: 40
+                                color: "#bbff0000"
+                                radius: 4
+
+                                Text {
+                                    id: vcText
+                                    anchors.fill: parent
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    text: verticalCrosshair.channelValue
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            id: horizontalCrosshair
+                            x: spectrumChart.plotArea.left
+                            y: crosshairMouseArea.mouseY - height / 2
+                            width: spectrumChart.plotArea.width
+                            height: 1
+                            visible: false
+                            color: "#bbff0000"
+
+                            Rectangle {
+                                anchors.left: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                height: 25
+                                width: 40
+                                color: "#bbff0000"
+                                radius: 4
+
+                                Text {
+                                    anchors.fill: parent
+                                    id: hcText
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    text: horizontalCrosshair.cpsValue
+                                }
+                            }
+                        }
+
+                        onEntered: {
+                            verticalCrosshair.visible = true;
+                            horizontalCrosshair.visible = true;
+                        }
+
+                        onExited: {
+                            verticalCrosshair.visible = false;
+                            horizontalCrosshair.visible = false;
+                        }
+
+                        onPositionChanged: {
+                            // Update the position of the crosshair elements based on the mouse position
+                            verticalCrosshair.x = mouseX - 1 / 2;
+                            horizontalCrosshair.y = mouseY - 1 / 2;
+
+                            // Calculate channel and cps values based on the mouse position
+                            var plotPos = spectrumChart.mapToValue(Qt.point(mouseX, mouseY));
+
+                            // Set the channel and cps values based on your calculation
+                            vcText.text = Math.floor(plotPos.x);
+                            hcText.text = Math.floor(plotPos.y); // Replace with your actual calculation
+                        }
+                    }
+
+
+                    MouseArea {
                         id: zoomMouseArea
                         anchors.fill: parent
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+
 
                         //zoom chart
                         property real startX
@@ -291,18 +264,14 @@ Item {
                                             zoomChart();
                                             updateRectangle(0, 0, 0, 0, false);
                                             isZoom = false;
-
-                                            console.log("onReleased Zoom")
                                         }
                                         if(isMove == true){
                                             isMove = false;
                                             isSelected = false
-                                            console.log("onReleased Move")
                                         }
 
                                         //draw vertical line if isnt moving
                                         drawVertical(mapToItem(spectrumChart, mouse.x, mouse.y).x, isSelected)
-                                        //console.log("Released - " + "EndX: " + endX + "; EndY: " + endY + "\n");
                                     }
 
                         onPressed: (mouse)=> {
@@ -312,26 +281,19 @@ Item {
                                            startY = mapToItem(spectrumChart, mouse.x, mouse.y).y;
                                            isZoom = true
                                            isSelected = true
-                                           console.log("onPressed Qt.LeftButton")
                                        }
                                        else if(mouse.button == Qt.RightButton){
                                            previous = Qt.point(mouse.x, mouse.y);
                                            isMove = true
-                                           console.log("onPressed Qt.RightButton")
                                        }
 
-
-
-                                       //console.log("Pressed - " + "StartX: " + startX + "; StartY: " + startY + "\n");
                                    }
 
                         onPositionChanged: (mouse)=> {
                                                if (isZoom == true){
-
                                                    endX = mapToItem(spectrumChart, mouse.x, mouse.y).x;
                                                    endY = mapToItem(spectrumChart, mouse.x, mouse.y).y;
                                                    updateRectangle(startX, startY, endX - startX, endY - startY, true);
-                                                   console.log("onPositionChanged Qt.LeftButton");
                                                }
 
                                                else if(isMove == true){
@@ -360,7 +322,6 @@ Item {
                                                            spectrumChart.scrollRight(-scrollPoint.x);
                                                        }
 
-                                                       console.log("onPositionChanged Qt.RightButton");
                                                        previous = Qt.point(mouse.x, mouse.y);
                                                    }
                                                }
@@ -389,13 +350,10 @@ Item {
                             linemarker.visible = visibleState
                             var theValue = x
                             linemarker.x = mouseX - linemarker.width/2
-
-                            console.log(visibleState)
                         }
                     }
-
-
                 }
+
             }
 
             Rectangle {
