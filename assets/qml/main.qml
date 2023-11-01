@@ -21,42 +21,6 @@ ApplicationWindow {
     Connections {
         target: fmContext
 
-        function onSpectrumChangedUsl(spectrum, name) {
-            // Clear the existing series data
-            spectrumSeries.clear();
-            spectrumSeries.name = name
-
-
-            // Add the updated spectrum data to the series
-            //for (var i = 0; i < spectrum.length; i++) {
-            for (var i = 0; i < 2048; i++) {
-                var dataPoint = spectrum[i];
-                spectrumSeries.append(i, dataPoint);
-            }
-
-            // Update the axis range based on the new data
-            valueAxisX.min = 0;
-            valueAxisX.max = spectrum.length - 1;
-
-            valueAxisY.min = 0;
-            valueAxisY.max = Math.max(...spectrum);
-        }
-
-        function onGausChangedUsl(spectrum, name) {
-            // Clear the existing series data
-            gausSeries.clear();
-            gausSeries.name = name
-
-
-            // Add the updated spectrum data to the series
-            //for (var i = 0; i < spectrum.length; i++) {
-            for (var i = 0; i < 2048; i++) {
-                var dataPoint = spectrum[i];
-                gausSeries.append(i, dataPoint);
-            }
-
-        }
-
         function onGetParamFromSettingsUsi(){
             param = []
             param.append(parseInt(averFactor.text))
@@ -150,94 +114,6 @@ ApplicationWindow {
                                 width: parent.width * 0.8 - 20
                             }
 
-
-
-                            /*
-                            Rectangle {
-                                id: rectangleDevListContent
-                                color: "#fafafa"
-                                radius: 10
-                                border.width: 0
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                layer.enabled: true
-                                layer.effect: DropShadow {
-                                    color: "#a3676767"
-                                    transparentBorder: true
-                                    horizontalOffset: 2
-                                    verticalOffset: 4
-                                    radius: 4
-
-                                }
-
-                                Rectangle {
-                                    id: devListRect
-                                    width: parent.width * 0.2
-                                    height: parent.height
-                                    anchors.left: parent.left
-                                    color: "blue"
-                                    radius: 10
-
-
-                                    ListView {
-                                        id: devList
-                                        anchors.fill: parent
-
-                                        model: 5
-                                        delegate:
-                                            Rectangle {
-
-                                            color: "green"
-                                        }
-
-
-
-                                    }
-                                }
-
-                                Rectangle {
-                                    id: devSpectrRect
-                                    width: parent.width * 0.8
-                                    height: parent.height
-                                    anchors.left: devListRect.right
-                                    color: "red"
-                                    radius: 10
-
-                                    ChartView {
-                                        anchors.fill: parent
-                                        antialiasing: true
-                                        anchors.margins: -5
-
-                                        ValueAxis {
-                                            id: valueAxisX
-                                            labelFormat: "%.0f"
-                                            min: 0
-                                            max: 2048
-                                        }
-
-                                        ValueAxis {
-                                            id: valueAxisY
-                                            labelFormat: "%.0f"
-
-                                        }
-
-                                        LineSeries {
-                                            id: spectrumSeries
-                                            name: "Spectrum"
-                                            axisX: valueAxisX
-                                            axisY: valueAxisY
-                                        }
-
-                                        LineSeries {
-                                            id: gausSeries
-                                            name: "Spectrum"
-                                            axisX: valueAxisX
-                                            axisY: valueAxisY
-                                        }
-                                    }
-                                }
-                            }
-                            */
                         }
                     }
 

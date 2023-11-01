@@ -147,6 +147,23 @@ Item {
                         width: 1
                         visible: false
                         color: "#bbff0000"
+
+                        Rectangle {
+                            anchors.top: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            height: 25
+                            width: 40
+                            color: "#bbff0000"
+                            radius: 4
+
+                            Text {
+                                anchors.fill: parent
+                                id: mcText
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                text: linemarker.channelMarker
+                            }
+                        }
                     }
 
                     MouseArea {
@@ -176,7 +193,7 @@ Item {
                                     anchors.fill: parent
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
-                                    text: verticalCrosshair.channelValue
+                                    text: ""
                                 }
                             }
                         }
@@ -203,7 +220,7 @@ Item {
                                     id: hcText
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
-                                    text: horizontalCrosshair.cpsValue
+                                    text: ""
                                 }
                             }
                         }
@@ -238,8 +255,6 @@ Item {
                         anchors.fill: parent
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-
-
                         //zoom chart
                         property real startX
                         property real startY
@@ -269,9 +284,11 @@ Item {
                                             isMove = false;
                                             isSelected = false
                                         }
+                                        if(startX == endX){
+                                            //draw vertical line if isnt moving
+                                            drawVertical(mapToItem(spectrumChart, mouse.x, mouse.y).x, isSelected)
+                                        }
 
-                                        //draw vertical line if isnt moving
-                                        drawVertical(mapToItem(spectrumChart, mouse.x, mouse.y).x, isSelected)
                                     }
 
                         onPressed: (mouse)=> {
@@ -279,6 +296,11 @@ Item {
                                        if(mouse.button == Qt.LeftButton){
                                            startX = mapToItem(spectrumChart, mouse.x, mouse.y).x;
                                            startY = mapToItem(spectrumChart, mouse.x, mouse.y).y;
+
+                                           // Calculate channel and cps values based on the mouse position
+                                           var plotPos = spectrumChart.mapToValue(Qt.point(mouseX, mouseY));
+                                           mcText.text = Math.floor(plotPos.x)
+
                                            isZoom = true
                                            isSelected = true
                                        }
@@ -294,11 +316,14 @@ Item {
                                                    endX = mapToItem(spectrumChart, mouse.x, mouse.y).x;
                                                    endY = mapToItem(spectrumChart, mouse.x, mouse.y).y;
                                                    updateRectangle(startX, startY, endX - startX, endY - startY, true);
+                                                   linemarker.visible = false
                                                }
 
                                                else if(isMove == true){
 
                                                    if(spectrumChart.isZoomed()) {
+
+                                                       linemarker.visible = false
 
                                                        scrollPoint.x = (previous.x - mouse.x)*scale;
                                                        scrollPoint.y = (previous.y - mouse.y)*scale;
